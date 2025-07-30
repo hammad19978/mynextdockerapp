@@ -1,4 +1,3 @@
-# .github/workflows/docker-build.yml
 name: Build and Push Docker image
 
 on:
@@ -25,3 +24,19 @@ jobs:
 
       - name: Push Docker Image
         run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/nextjs-app:latest
+
+      # Send an email if the build fails
+      - name: Send failure email
+        if: failure()  # This step only runs if the previous steps fail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          from: ${{ secrets.GMAIL_USERNAME }}
+          to: muhammadanas6678@gmail.com  # Replace with your actual email
+          subject: 'GitHub Action Docker Build Failed'
+          body: |
+            The Docker build process for your Next.js app has failed.
+            Please check the GitHub Actions logs for more details.
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_PASSWORD }}
